@@ -263,10 +263,10 @@ class RNFetchBlobFS {
         if (state.equals(Environment.MEDIA_MOUNTED)) {
             res.put("SDCardDir", Environment.getExternalStorageDirectory().getAbsolutePath());
 
-            File externalDirectory = ctx.getExternalFilesDir(null);
+            File[] externalDirectory = ctx.getExternalFilesDirs(null);
 
-            if (externalDirectory != null) {
-                res.put("SDCardApplicationDir", externalDirectory.getParentFile().getAbsolutePath());
+            if (externalDirectory[1] != null) {
+                res.put("SDCardApplicationDir", externalDirectory[1].getParentFile().getAbsolutePath());
             } else {
               res.put("SDCardApplicationDir", "");
             }
@@ -987,10 +987,15 @@ class RNFetchBlobFS {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
             args.putString("internal_free", String.valueOf(stat.getFreeBytes()));
             args.putString("internal_total", String.valueOf(stat.getTotalBytes()));
-            StatFs statEx = new StatFs(Environment.getExternalStorageDirectory().getPath());
-            args.putString("external_free", String.valueOf(statEx.getFreeBytes()));
-            args.putString("external_total", String.valueOf(statEx.getTotalBytes()));
-
+            File[] exDirs = RNFetchBlob.RCTContext.getExternalFilesDirs(null);
+            if(exDirs[1] != null){
+                StatFs statEx = new StatFs(exDirs[1].getAbsolutePath());
+                args.putString("external_free", String.valueOf(statEx.getFreeBytes()));
+                args.putString("external_total", String.valueOf(statEx.getTotalBytes()));
+            }else{
+                args.putString("external_free", "0");
+                args.putString("external_total", "0");
+            }
         }
         callback.invoke(null ,args);
     }
