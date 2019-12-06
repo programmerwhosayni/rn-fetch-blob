@@ -265,9 +265,9 @@ class RNFetchBlobFS {
 
             File[] externalDirectory = ctx.getExternalFilesDirs(null);
 
-            if (externalDirectory[1] != null) {
+            try {
                 res.put("SDCardApplicationDir", externalDirectory[1].getParentFile().getAbsolutePath());
-            } else {
+            } catch (IndexOutOfBoundsException e){
               res.put("SDCardApplicationDir", "");
             }
         }
@@ -988,11 +988,12 @@ class RNFetchBlobFS {
             args.putString("internal_free", String.valueOf(stat.getFreeBytes()));
             args.putString("internal_total", String.valueOf(stat.getTotalBytes()));
             File[] exDirs = RNFetchBlob.RCTContext.getExternalFilesDirs(null);
-            if(exDirs[1] != null){
+            
+            try{
                 StatFs statEx = new StatFs(exDirs[1].getAbsolutePath());
                 args.putString("external_free", String.valueOf(statEx.getFreeBytes()));
                 args.putString("external_total", String.valueOf(statEx.getTotalBytes()));
-            }else{
+            } catch (IndexOutOfBoundsException e){
                 args.putString("external_free", "0");
                 args.putString("external_total", "0");
             }
